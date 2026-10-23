@@ -9,7 +9,7 @@ import { ErrorSummary, Field } from './ui'
 
 export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const router = useRouter()
-  const next = useSearchParams().get('next') || '/firm'
+  const next = useSearchParams()?.get('next') || '/firm'
   const [form, setForm] = useState({ firmName: '', fullName: '', email: '', password: '' })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [summary, setSummary] = useState<string[]>([])

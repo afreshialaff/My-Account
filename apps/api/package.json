@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node scripts/embed-migrations.js && tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "start:dev": "tsc -p tsconfig.build.json && (tsc -p tsconfig.build.json --watch --preserveWatchOutput & node --watch dist/main.js)",
-    "db:migrate": "tsc -p tsconfig.build.json && node dist/db/migrate.js",
-    "db:seed": "tsc -p tsconfig.build.json && node dist/db/seed.js",
-    "test": "jest --runInBand"
+    "db:migrate": "npm run build && node dist/db/migrate.js",
+    "db:seed": "npm run build && node dist/db/seed.js",
+    "test": "jest --runInBand",
+    "pretest": "node scripts/embed-migrations.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",
@@ -39,5 +40,6 @@
     "supertest": "^7.3.1",
     "ts-jest": "^29.4.15",
     "typescript": "5.6"
-  }
+  },
+  "main": "dist/serverless.js"
 }

@@ -38,9 +38,9 @@ export function ReportIndex({ entityId }: { entityId: string }) {
 }
 
 function useParamsState(defaults: Record<string, string>) {
-  const sp = useSearchParams()
+  const sp = useSearchParams() ?? new URLSearchParams()
   const router = useRouter()
-  const path = usePathname()
+  const path = usePathname() ?? ''
   const get = (k: string) => sp.get(k) ?? defaults[k]
   const set = (k: string, v: string) => {
     const n = new URLSearchParams(sp)

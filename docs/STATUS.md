@@ -28,6 +28,9 @@ Last updated: 2026-10-23 (Sprint 01–06 foundation slice). Labels: **Implemente
 
 Covered quality gates (`quality-gates.md`): #1 debit/credit edge cases incl. precision, #2 idempotent duplicate & concurrent posting, #3 cross-tenant & cross-client denial, #4 approved ≠ posted, #5 correction only by reversal, #12 TB/P&L/BS cross-check, #15 locked period blocks posting & audited reopen. Not yet applicable: #6–#11, #13, #14.
 
+## Deployment
+- Single Vercel project (root `apps/web`) hosts web + API (`apps/api/src/serverless.ts`); first request migrates (advisory-locked) and seeds the [DEMO] firm. Verified locally against an empty database with only `DATABASE_URL` set: migration + seed + boot ≈ 4.7 s, full browser E2E passed. Not yet verified on Vercel/Neon itself (the build sandbox cannot reach Vercel).
+
 ## Known issues / decisions
 - Login uses email + password with JWT cookies; OIDC/MFA is required by the spec and not done yet.
 - Entity-level isolation inside a firm is enforced by the API (`assertEntity`) and covered by tests, not by RLS.

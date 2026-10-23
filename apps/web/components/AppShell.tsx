@@ -32,7 +32,7 @@ const ICONS: Record<string, typeof Menu> = { BarChart3, BookOpen, Boxes, Briefca
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { data: me, error } = useApi<Me>('/me')
-  const path = usePathname()
+  const path = usePathname() ?? ''
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   useEffect(() => setMobileOpen(false), [path])

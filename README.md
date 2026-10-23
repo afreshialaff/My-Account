@@ -36,10 +36,16 @@ npm test -w @aos/lite    # 12 tes mesin akuntansi aplikasi lite
 node e2e/journal-flow.mjs  # E2E browser (butuh web+api berjalan dengan data demo, dan playwright)
 ```
 
-## Deploy
+## Deploy (cara tercepat: satu project Vercel)
 
-- **Aplikasi lite**: `vercel.json` di root mem-build `apps/lite`. Project Vercel yang sudah ada tetap berjalan seperti sebelumnya.
-- **Accounting OS (web + api)**:
-  1. Database PostgreSQL terkelola (mis. Neon atau Supabase). Jalankan `npm run db:migrate -w @aos/api` dengan `DATABASE_ADMIN_URL`.
-  2. API sebagai layanan Node yang berjalan terus (Railway, Render, Fly.io; tersedia `apps/api/Dockerfile`). Set `DATABASE_URL` (role aplikasi), `JWT_SECRET` (≥32 karakter), `COOKIE_SECURE=true`, `WEB_ORIGIN`.
-  3. Web di Vercel: buat project baru dengan **Root Directory `apps/web`** dan env `API_URL=https://<api-anda>`.
+API NestJS berjalan di dalam Next.js (`apps/web/pages/api/v1/[...path].ts`), jadi cukup **satu project Vercel + database Neon**:
+
+1. Vercel → **Add New → Project** → import repo `My-Account` → **Root Directory: `apps/web`** → Deploy.
+2. Di project itu buka tab **Storage → Create Database → Neon** → hubungkan ke project (Vercel otomatis mengisi `DATABASE_URL`).
+3. **Deployments → Redeploy**. Request pertama otomatis menjalankan migrasi dan membuat sandbox `[DEMO]`
+   (login `partner@demo.accounting-os.local` / `demo-password-123`). Set `DEMO_SEED=false` untuk menonaktifkan data demo.
+
+Opsional: set `JWT_SECRET` (≥32 karakter) dan `APP_DB_PASSWORD`; jika tidak diisi, keduanya diturunkan dari connection string database.
+Aplikasi lite tetap di-deploy oleh project yang Root Directory-nya root repo (`vercel.json`).
+
+Alternatif: API terpisah (Railway/Render/Fly, `apps/api/Dockerfile`) dan set `API_URL` di project web.

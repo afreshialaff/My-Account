@@ -15,7 +15,7 @@ export type Db = PoolClient
 
 @Injectable()
 export class DbService implements OnModuleDestroy {
-  readonly pool = new Pool({ connectionString: config.databaseUrl, max: 10 })
+  readonly pool = new Pool({ connectionString: config.databaseUrl, max: Number(process.env.PG_POOL_MAX || 10) })
 
   /**
    * Runs `fn` in a transaction scoped to one firm. Row level security reads

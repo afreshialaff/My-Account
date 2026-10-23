@@ -1,25 +1,24 @@
-import { readdirSync, readFileSync } from 'fs'
-import { join } from 'path'
 import { Client } from 'pg'
 import { config } from '../config'
+import { MIGRATIONS } from './migrations.generated'
 
 /**
- * Applies SQL files in /migrations in order, each in its own transaction, then makes sure
+ * Applies the SQL files from /migrations (embedded at build time) in order, each in its own transaction, then makes sure
  * the non-privileged application role exists and has DML grants (RLS applies to it).
  */
 export async function migrate(log = console.log) {
   const db = new Client({ connectionString: config.adminDatabaseUrl })
   await db.connect()
   try {
+    // Serialise concurrent runs (e.g. several serverless cold starts).
+    await db.query(`select pg_advisory_lock(hashtext('aos-migrate'))`)
     await db.query(`create table if not exists schema_migrations (name text primary key, applied_at timestamptz not null default now())`)
-    const dir = join(__dirname, '..', '..', 'migrations')
-    const files = readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()
     const done = new Set((await db.query('select name from schema_migrations')).rows.map((r) => r.name))
-    for (const f of files) {
+    for (const { name: f, sql } of MIGRATIONS) {
       if (done.has(f)) continue
       await db.query('begin')
       try {
-        await db.query(readFileSync(join(dir, f), 'utf8'))
+        await db.query(sql)
         await db.query('insert into schema_migrations (name) values ($1)', [f])
         await db.query('commit')
         log(`applied ${f}`)
@@ -36,6 +35,8 @@ export async function migrate(log = console.log) {
       if (!config.appDbPassword) throw new Error('APP_DB_PASSWORD is required to create the application role')
       await db.query(`create role ${role} login password '${config.appDbPassword.replace(/'/g, "''")}' nosuperuser nobypassrls`)
       log(`created role ${role}`)
+    } else if (config.appDbPassword) {
+      await db.query(`alter role ${role} with login password '${config.appDbPassword.replace(/'/g, "''")}'`)
     }
     await db.query(`grant usage on schema public to ${role}`)
     await db.query(`grant select, insert, update, delete on all tables in schema public to ${role}`)

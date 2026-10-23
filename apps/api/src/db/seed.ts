@@ -16,16 +16,10 @@ import { DbService } from './db.service'
 const PASSWORD = 'demo-password-123'
 const DOMAIN = 'demo.accounting-os.local'
 
-async function main() {
-  const db = new DbService()
+/** Seeds the demo firm once (safe to call concurrently). Returns false when it already exists. */
+export async function seedDemo(db: DbService): Promise<boolean> {
   const firmId = randomUUID()
   const users: Record<Role, string> = { partner: randomUUID(), manager: randomUUID(), accountant: randomUUID(), auditor: randomUUID() }
-  const exists = await db.txWith({ 'app.auth_email': `partner@${DOMAIN}` }, async (c) => (await c.query('select 1 from users where email = $1', [`partner@${DOMAIN}`])).rowCount)
-  if (exists) {
-    console.log('demo firm already seeded')
-    await db.pool.end()
-    return
-  }
   const hash = await bcrypt.hash(PASSWORD, 12)
   const partner: AuthCtx = { firmId, userId: users.partner, role: 'partner' }
   const manager: AuthCtx = { firmId, userId: users.manager, role: 'manager' }
@@ -38,7 +32,9 @@ async function main() {
     return s > today ? today : s
   }
 
-  await db.txWith({ 'app.firm_id': firmId, 'app.user_id': users.partner }, async (c) => {
+  return db.txWith({ 'app.firm_id': firmId, 'app.user_id': users.partner, 'app.auth_email': `partner@${DOMAIN}` }, async (c) => {
+    await c.query(`select pg_advisory_xact_lock(hashtext('aos-demo-seed'))`)
+    if ((await c.query('select 1 from users where email = $1', [`partner@${DOMAIN}`])).rowCount) return false
     await c.query('insert into firms (id, name) values ($1, $2)', [firmId, '[DEMO] KAP Sejahtera & Rekan'])
     const names: Record<Role, string> = { partner: 'Siti Rahma (Partner)', manager: 'Andi Wijaya (Manager)', accountant: 'Dewi Lestari (Akuntan)', auditor: 'Bayu Pratama (Auditor)' }
     for (const role of Object.keys(users) as Role[]) {
@@ -87,13 +83,17 @@ async function main() {
         await flow(today, 'Draft: biaya perjalanan dinas', [L('6-60204', amt(2_400_000), '0'), L('1-10001', '0', amt(2_400_000))], 'draft')
       }
     }
+    return true
   })
-  console.log(`seeded [DEMO] firm. Login: partner@${DOMAIN} / ${PASSWORD} (also manager@, accountant@, auditor@)`)
-  await db.pool.end()
 }
-
-void config
-main().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+if (require.main === module) {
+  void config
+  const db = new DbService()
+  seedDemo(db)
+    .then((created) => console.log(created ? `seeded [DEMO] firm. Login: partner@${DOMAIN} / ${PASSWORD} (also manager@, accountant@, auditor@)` : 'demo firm already seeded'))
+    .catch((e) => {
+      console.error(e)
+      process.exitCode = 1
+    })
+    .finally(() => db.pool.end())
+}
