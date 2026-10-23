@@ -1,58 +1,45 @@
-# MyAccount — Software Akuntansi Online
+# Accounting OS
 
-Aplikasi akuntansi berbasis web (terinspirasi dari Jurnal.id) dengan mesin pembukuan **double-entry** lengkap. Dibangun dengan React + TypeScript + Vite + Tailwind CSS. Data disimpan di `localStorage` browser, jadi tidak perlu backend.
+Software akuntansi multi-klien untuk kantor akuntan di Indonesia: satu firma mengelola banyak klien, tiap klien punya beberapa perusahaan (entitas legal) dan cabang. Struktur menunya mengikuti Mekari Jurnal dan Accurate Online. Mesin pembukuannya double-entry yang dapat diaudit.
 
-## Fitur
+> **Status:** fondasi Sprint 01–06 sudah berjalan end-to-end (tenancy, RBAC, COA, periode, mesin jurnal, laporan inti, log audit). Modul lain tampil di menu sebagai **Segera** dan belum memiliki fungsi. Rinciannya ada di [`docs/STATUS.md`](docs/STATUS.md).
 
-| Modul | Isi |
+| Folder | Isi |
 |---|---|
-| **Beranda** | Saldo kas & bank, piutang, hutang, laba bulan ini, grafik laba rugi 6 bulan, arus kas, komposisi biaya, faktur belum lunas |
-| **Penjualan** | Faktur penjualan (diskon, PPN 11%/12%, syarat pembayaran), status Lunas/Sebagian/Jatuh Tempo, terima pembayaran (parsial/multi-faktur) |
-| **Pembelian** | Faktur pembelian, kirim pembayaran ke supplier |
-| **Biaya** | Pencatatan biaya dibayar dari kas/bank, PPN Masukan |
-| **Kas & Bank** | Saldo per rekening, mutasi rekening, Transfer Dana, Terima Uang, Kirim Uang |
-| **Produk** | Persediaan perpetual, HPP **rata-rata bergerak** (moving average), saldo awal stok, produk jasa/non-stok |
-| **Kontak** | Pelanggan, supplier, karyawan, saldo piutang/hutang per kontak |
-| **Daftar Akun** | Bagan akun standar Indonesia (1-xxxxx s/d 9-xxxxx), 16 kategori akun seperti Jurnal |
-| **Jurnal Umum** | Jurnal manual dengan validasi debit = kredit |
-| **Laporan** | Neraca, Laba Rugi, Arus Kas (metode langsung), Perubahan Modal, Neraca Saldo, Buku Besar, Jurnal, Umur Piutang, Umur Hutang, Penjualan per Pelanggan, Pembelian per Supplier, Ringkasan Persediaan, Ringkasan PPN |
-| **Pengaturan** | Profil perusahaan, backup/restore JSON, muat data demo, kosongkan data |
+| `apps/api` | NestJS 11 + PostgreSQL 16 dengan Row Level Security · `/api/v1` · Swagger di `/api/docs` |
+| `apps/web` | Next.js 15 (App Router) + Tailwind · UI dari design system `design-system/accounting-os` |
+| `apps/lite` | Aplikasi awal (Vite, localStorage, satu pengguna). Tetap dipertahankan dan di-deploy |
+| `docs/` | [Arsitektur, ERD & kontrak API](docs/ARCHITECTURE.md) · [Status modul](docs/STATUS.md) · [Riset Jurnal/Accurate](docs/RESEARCH-modules.md) |
+| `.claude/skills/` | Skill proyek: `accounting-os-builder` (spesifikasi) dan `ui-ux-pro-max` (desain UI/UX) |
 
-## Logika akuntansi
+## Menjalankan secara lokal
 
-Setiap dokumen diterjemahkan otomatis menjadi jurnal yang seimbang (`src/lib/ledger.ts`), dan semua laporan dihitung dari jurnal tersebut:
-
-| Transaksi | Debit | Kredit |
-|---|---|---|
-| Faktur penjualan | Piutang Usaha (total) | Pendapatan (neto setelah diskon), PPN Keluaran |
-| ↳ produk berstok | Beban Pokok Pendapatan | Persediaan Barang (HPP rata-rata) |
-| Terima pembayaran | Kas/Bank | Piutang Usaha |
-| Faktur pembelian | Persediaan / akun biaya, PPN Masukan | Hutang Usaha |
-| Bayar supplier | Hutang Usaha | Kas/Bank |
-| Biaya | Akun beban, PPN Masukan | Kas/Bank |
-| Transfer dana | Rekening tujuan | Rekening asal |
-| Terima / kirim uang | Kas/Bank ↔ akun lawan | |
-| Saldo awal persediaan | Persediaan Barang | Ekuitas Saldo Awal |
-
-- **Neraca**: Aset = Kewajiban + Ekuitas. Ekuitas memuat "Pendapatan sampai tahun lalu" (laba ditahan) dan "Pendapatan periode ini" (laba tahun berjalan), dihitung otomatis tanpa perlu jurnal penutup.
-- **Akun kontra** (Akumulasi Penyusutan, Diskon/Retur Penjualan) disajikan mengurangi kelompoknya.
-- **Arus kas** metode langsung: setiap baris non-kas pada jurnal yang menyentuh kas diklasifikasikan ke aktivitas operasi, investasi, atau pendanaan berdasarkan kategori akunnya; saldo akhir selalu terekonsiliasi dengan saldo kas.
-
-Unit test di `src/lib/ledger.test.ts` memverifikasi jurnal seimbang, HPP rata-rata, saldo persediaan = valuasi stok, neraca seimbang, neraca saldo, umur piutang, dan rekonsiliasi arus kas.
-
-## Menjalankan
+Prasyarat: Node 22 dan PostgreSQL 14+ (butuh ekstensi `btree_gist` dan `citext`).
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm test         # unit test logika akuntansi
-npm run build    # build produksi ke dist/
+cp apps/api/.env.example apps/api/.env          # sesuaikan DATABASE_URL / DATABASE_ADMIN_URL / JWT_SECRET
+createdb accounting_os
+npm run db:migrate -w @aos/api                  # migrasi + membuat role aplikasi non-superuser
+npm run db:seed -w @aos/api                     # sandbox [DEMO], opsional
+npm run start:dev -w @aos/api                   # http://localhost:4000/api/docs
+npm run dev -w @aos/web                         # http://localhost:3000
 ```
 
-## Deploy ke Vercel
+Login demo (kata sandi `demo-password-123`): `partner@demo.accounting-os.local`, `manager@…`, `accountant@…`, `auditor@…`.
 
-Proyek ini adalah situs statis Vite. `vercel.json` sudah mengatur rewrite SPA.
+## Tes
 
-1. Buka https://vercel.com/new dan import repository GitHub `My-Account`.
-2. Framework preset: **Vite** (otomatis terdeteksi). Build command `npm run build`, output `dist`.
-3. Klik **Deploy**. Setiap push ke `main` akan otomatis ter-deploy ulang.
+```bash
+npm test -w @aos/api     # 19 tes integrasi terhadap PostgreSQL sungguhan (isolasi tenant, saldo, idempotensi, maker-checker, immutability, reversal, kunci periode, laporan)
+npm test -w @aos/lite    # 12 tes mesin akuntansi aplikasi lite
+node e2e/journal-flow.mjs  # E2E browser (butuh web+api berjalan dengan data demo, dan playwright)
+```
+
+## Deploy
+
+- **Aplikasi lite**: `vercel.json` di root mem-build `apps/lite`. Project Vercel yang sudah ada tetap berjalan seperti sebelumnya.
+- **Accounting OS (web + api)**:
+  1. Database PostgreSQL terkelola (mis. Neon atau Supabase). Jalankan `npm run db:migrate -w @aos/api` dengan `DATABASE_ADMIN_URL`.
+  2. API sebagai layanan Node yang berjalan terus (Railway, Render, Fly.io; tersedia `apps/api/Dockerfile`). Set `DATABASE_URL` (role aplikasi), `JWT_SECRET` (≥32 karakter), `COOKIE_SECURE=true`, `WEB_ORIGIN`.
+  3. Web di Vercel: buat project baru dengan **Root Directory `apps/web`** dan env `API_URL=https://<api-anda>`.

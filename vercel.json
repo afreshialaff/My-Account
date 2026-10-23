@@ -1,3 +1,6 @@
 {
+  "installCommand": "npm install",
+  "buildCommand": "npm run build -w @aos/lite",
+  "outputDirectory": "apps/lite/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

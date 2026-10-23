@@ -1,0 +1,4 @@
+interface:
+  display_name: "Accounting OS Builder"
+  short_description: "Design and build an auditable multi-client accounting ERP"
+  brand_color: "#216B79"

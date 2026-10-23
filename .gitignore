@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# monorepo
+.next
+.env
+.env.local
+apps/*/dist
+coverage
+e2e/shots

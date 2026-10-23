@@ -1,37 +1,13 @@
 {
-  "name": "my-account",
+  "name": "accounting-os",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "vitest run"
-  },
-  "dependencies": {
-    "lucide-react": "^1.61.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.6",
-    "recharts": "^3.10.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
-    "autoprefixer": "^10.6.1",
-    "eslint": "^9.13.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
-    "globals": "^15.11.0",
-    "postcss": "^8.5.31",
-    "tailwindcss": "^3.4.19",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.9"
+    "dev:api": "npm run start:dev -w @aos/api",
+    "dev:web": "npm run dev -w @aos/web",
+    "db:migrate": "npm run db:migrate -w @aos/api",
+    "db:seed": "npm run db:seed -w @aos/api",
+    "test": "npm test -w @aos/api && npm test -w @aos/lite",
+    "build": "npm run build -w @aos/api && npm run build -w @aos/web && npm run build -w @aos/lite"
   }
 }

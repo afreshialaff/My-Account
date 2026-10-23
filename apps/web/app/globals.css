@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens: design-system/accounting-os/MASTER.md (Banking/Traditional Finance palette, light-first). */
+:root {
+  --primary: 30 58 138; /* #1E3A8A */
+  --primary-strong: 15 23 42; /* #0F172A */
+  --primary-soft: 219 234 254; /* #DBEAFE */
+  --accent: 161 98 7; /* #A16207 */
+  --bg: 248 250 252; /* #F8FAFC */
+  --card: 255 255 255;
+  --muted: 232 236 241; /* #E8ECF1 */
+  --muted-fg: 71 85 105; /* #475569 */
+  --border: 226 232 240; /* #E2E8F0 */
+  --danger: 220 38 38;
+  --success: 4 120 87;
+  --warning: 180 83 9;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas font-sans text-[14px] leading-normal text-primary-strong antialiased;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-line bg-surface;
+  }
+  .btn {
+    @apply inline-flex min-h-[36px] cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-strong;
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-surface text-primary-strong hover:bg-muted;
+  }
+  .btn-danger {
+    @apply btn border border-danger/30 bg-surface text-danger hover:bg-danger/5;
+  }
+  .btn-ghost {
+    @apply btn text-muted-fg hover:bg-muted hover:text-primary-strong;
+  }
+  .input {
+    @apply min-h-[36px] w-full rounded-md border border-line bg-surface px-2.5 text-sm text-primary-strong placeholder:text-muted-fg/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 aria-[invalid=true]:border-danger;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium text-muted-fg;
+  }
+  .tbl {
+    @apply w-full border-collapse text-sm;
+  }
+  .tbl th {
+    @apply sticky top-0 border-b border-line bg-muted/60 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-fg;
+  }
+  .tbl td {
+    @apply border-b border-line/70 px-3 py-2 align-middle;
+  }
+  .tbl tbody tr:hover {
+    @apply bg-primary-soft/30;
+  }
+  .num {
+    @apply text-right font-mono tabular-nums;
+  }
+  .link {
+    @apply font-medium text-primary hover:underline;
+  }
+}
