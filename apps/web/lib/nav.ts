@@ -134,6 +134,21 @@ export const PLANNED: Record<string, PlannedModule> = {
       'Tidak pernah mengubah dokumen yang sudah diposting',
     ],
   },
+  ecosystem: {
+    title: 'Ekosistem My Account',
+    sprint: 'Roadmap setelah Sprint 27',
+    module: 'Lintas modul',
+    reference: 'Ekosistem Mekari: Jurnal, Talenta, Klikpajak, Expense, Sign, POS/Desty, Pay, Qontak',
+    features: [
+      'Penggajian & HR (setara Talenta) → modul Penggajian, posting jurnal gaji lewat mesin yang sama',
+      'Pajak (setara Klikpajak) → register PPN/PPh dan rekonsiliasi pajak vs GL',
+      'Biaya & reimbursement (setara Expense) → persetujuan biaya yang menghasilkan jurnal',
+      'Tanda tangan digital & arsip dokumen (setara Sign) → lampiran dan bukti persetujuan jurnal',
+      'Kasir & marketplace (setara POS/Desty) dan pembayaran (setara Pay) → impor penjualan & rekonsiliasi bank',
+      'CRM (setara Qontak) → data pelanggan terhubung ke Faktur Penjualan',
+      'Seluruh integrasi memakai API resmi/CSV dan akun milik pengguna; tidak ada klaim koneksi langsung sebelum diverifikasi',
+    ],
+  },
   dimensions: {
     title: 'Dimensi: Proyek, Departemen, Cost Center, Tag',
     sprint: 'Sprint 05–06',
@@ -210,7 +225,15 @@ export const ENTITY_NAV: NavGroup[] = [
       { label: 'Laporan Lanjutan & Ekspor', href: '/m/reports-more', status: 'planned' },
     ],
   },
-  { key: 'integrations', label: 'Integrasi', icon: 'Sheet', items: [{ label: 'Google Sheets', href: '/m/integrations', status: 'planned' }] },
+  {
+    key: 'integrations',
+    label: 'Integrasi',
+    icon: 'Sheet',
+    items: [
+      { label: 'Ekosistem', href: '/m/ecosystem', status: 'planned' },
+      { label: 'Google Sheets', href: '/m/integrations', status: 'planned' },
+    ],
+  },
   {
     key: 'settings',
     label: 'Pengaturan',

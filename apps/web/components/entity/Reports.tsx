@@ -22,7 +22,7 @@ export function ReportIndex({ entityId }: { entityId: string }) {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {REPORTS.map((r) => (
           <Link key={r.slug} href={`/e/${entityId}/reports/${r.slug}`} className="card p-4 transition-shadow hover:shadow-md">
-            <div className="font-semibold text-primary">{r.title}</div>
+            <div className="font-semibold text-primary-strong">{r.title}</div>
             <div className="mt-1 text-sm text-muted-fg">{r.desc}</div>
           </Link>
         ))}
@@ -91,7 +91,7 @@ function Row({ label, value, level = 0, bold, border, href }: { label: ReactNode
   return (
     <div className={`flex justify-between gap-4 py-1.5 text-sm ${bold ? 'font-semibold' : ''} ${border ? 'border-t border-primary-strong/30' : ''}`} style={{ paddingLeft: level * 18 }}>
       <span>{href ? <Link className="link font-normal" href={href}>{label}</Link> : label}</span>
-      {value !== undefined && <span className={`font-mono tabular-nums ${value.startsWith('-') ? 'text-danger' : ''}`}>{amount(value, { zero: '0' })}</span>}
+      {value !== undefined && <span className={`font-medium tabular-nums ${value.startsWith('-') ? 'text-danger' : ''}`}>{amount(value, { zero: '0' })}</span>}
     </div>
   )
 }
@@ -117,7 +117,7 @@ function SectionBlock({ s, entityId, from, to, level = 1 }: { s: Section; entity
 }
 
 function BalancedNote({ ok, okText, badText }: { ok: boolean; okText: string; badText: string }) {
-  return <div className={`mt-4 rounded-md px-3 py-2 text-center text-sm ${ok ? 'bg-emerald-50 text-success' : 'bg-rose-50 text-danger'}`}>{ok ? `✓ ${okText}` : badText}</div>
+  return <div className={`mt-4 rounded-md px-3 py-2 text-center text-sm ${ok ? 'bg-success/10 text-success' : 'bg-danger/5 text-danger'}`}>{ok ? `✓ ${okText}` : badText}</div>
 }
 
 /* ------------------------------------------------------------------ */

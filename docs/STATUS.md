@@ -17,6 +17,10 @@ Last updated: 2026-10-23 (Sprint 01–06 foundation slice). Labels: **Implemente
 | 11 | Custom report builder | Planned (S24–25) | — | Entire module |
 | 12 | Google Sheets two-way sync | Planned (S26–27) | — | Entire module |
 
+## Rebrand slice — 2026-11-07 (My Account · Sand Elegance)
+Implemented: design tokens (60/30/10), Plus Jakarta Sans, logo component + favicon, restyled shell/login/UI kit, Ctrl/⌘+K menu search, dashboard quick actions, Ekosistem roadmap entry, `docs/RECON-mekari-jurnal.md`, contrast table in `design-system/accounting-os/MASTER.md`.
+Not done: master vector logo files (monogram is an approximation of the supplied art), `apps/lite` still uses the old palette, no new accounting modules (still planned as above), not deployed.
+
 ## Tests actually run
 
 | Suite | Command | Result |

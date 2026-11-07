@@ -66,7 +66,7 @@ export function JournalList({ entityId }: { entityId: string }) {
                 setStatus(t.value)
                 setPage(0)
               }}
-              className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium ${status === t.value ? 'border-primary text-primary' : 'border-transparent text-muted-fg hover:text-primary-strong'}`}
+              className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium ${status === t.value ? 'border-accent text-primary-strong font-semibold' : 'border-transparent text-muted-fg hover:text-primary-strong'}`}
             >
               {t.label}
             </button>
@@ -330,7 +330,7 @@ export function JournalEditor({ entityId, journalId }: { entityId: string; journ
                       <input
                         aria-label={`Debit baris ${i + 1}`}
                         inputMode="decimal"
-                        className="input text-right font-mono"
+                        className="input text-right font-medium tabular-nums"
                         value={l.debit}
                         aria-invalid={p.d === null}
                         onChange={(e) => setLine(i, { debit: e.target.value, credit: e.target.value ? '' : l.credit })}
@@ -342,7 +342,7 @@ export function JournalEditor({ entityId, journalId }: { entityId: string; journ
                       <input
                         aria-label={`Kredit baris ${i + 1}`}
                         inputMode="decimal"
-                        className="input text-right font-mono"
+                        className="input text-right font-medium tabular-nums"
                         value={l.credit}
                         aria-invalid={p.c === null}
                         onChange={(e) => setLine(i, { credit: e.target.value, debit: e.target.value ? '' : l.debit })}
@@ -582,10 +582,10 @@ export function JournalDetail({ entityId, journalId, initialError }: { entityId:
       />
       <ErrorSummary messages={err} />
       {j.status === 'submitted' && mine && can('journal.approve') && (
-        <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">Pemisahan tugas: jurnal ini harus disetujui oleh pengguna lain.</div>
+        <div className="mb-4 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-primary-strong">Pemisahan tugas: jurnal ini harus disetujui oleh pengguna lain.</div>
       )}
       {j.reversal_of && (
-        <div className="mb-4 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-800">
+        <div className="mb-4 rounded-md bg-danger/5 px-3 py-2 text-sm text-danger">
           Jurnal pembalik untuk{' '}
           <Link className="link" href={`/e/${entityId}/journals/${j.reversal_of}`}>
             {j.reversal_of_number}
@@ -593,7 +593,7 @@ export function JournalDetail({ entityId, journalId, initialError }: { entityId:
         </div>
       )}
       {j.reversed_by && (
-        <div className="mb-4 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-800">
+        <div className="mb-4 rounded-md bg-danger/5 px-3 py-2 text-sm text-danger">
           Jurnal ini telah dibalik oleh{' '}
           <Link className="link" href={`/e/${entityId}/journals/${j.reversed_by}`}>
             {j.reversed_by_number}
@@ -643,7 +643,7 @@ export function JournalDetail({ entityId, journalId, initialError }: { entityId:
           <ol className="space-y-3 p-4 text-sm">
             {j.history.map((h, i) => (
               <li key={i} className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden />
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden />
                 <div>
                   <div className="font-medium">{ACTION_LABEL[h.action] ?? h.action}</div>
                   <div className="text-xs text-muted-fg">

@@ -1,6 +1,6 @@
 'use client'
 
-import { Lock, LockOpen, Plus } from 'lucide-react'
+import { BarChart3, BookOpen, Lock, LockOpen, Plus, Scale } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState, type FormEvent } from 'react'
 import { api, errorText, refresh, useApi, type Account, type Entity, type JournalStatus, type Me } from '@/lib/api'
@@ -39,6 +39,24 @@ export function EntityDashboard({ entityId }: { entityId: string }) {
           </Link>
         }
       />
+      <nav aria-label="Pintasan" className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {[
+          { href: `/e/${entityId}/journals/new`, icon: Plus, label: 'Buat jurnal', hint: 'Catat transaksi baru' },
+          { href: `/e/${entityId}/reports/profit-loss`, icon: BarChart3, label: 'Laba Rugi', hint: 'Kinerja bulan ini' },
+          { href: `/e/${entityId}/reports/balance-sheet`, icon: Scale, label: 'Neraca', hint: 'Posisi keuangan' },
+          { href: `/e/${entityId}/accounts`, icon: BookOpen, label: 'Daftar Akun', hint: 'Kelola COA' },
+        ].map(({ href, icon: Icon, label, hint }) => (
+          <Link key={label} href={href} className="card group flex items-center gap-3 p-3 transition-colors hover:border-accent">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-strong group-hover:bg-accent group-hover:text-white" aria-hidden>
+              <Icon size={18} />
+            </span>
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-sm font-semibold">{label}</span>
+              <span className="block truncate text-xs text-muted-fg">{hint}</span>
+            </span>
+          </Link>
+        ))}
+      </nav>
       <div className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Kas & Bank" value={rupiah(s.cashBank)} href={`/e/${entityId}/reports/balance-sheet`} />
         <StatCard label="Piutang" value={rupiah(s.receivable)} tone="accent" href={`/e/${entityId}/reports/balance-sheet`} />
@@ -49,7 +67,7 @@ export function EntityDashboard({ entityId }: { entityId: string }) {
         <div className="card overflow-hidden xl:col-span-2">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <h2 className="font-semibold">Jurnal terbaru</h2>
-            <Link href={`/e/${entityId}/journals`} className="text-xs font-medium text-primary hover:underline">
+            <Link href={`/e/${entityId}/journals`} className="text-xs font-semibold text-accent-deep hover:underline">
               Lihat semua
             </Link>
           </div>

@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Percent,
+  Search,
   Receipt,
   Settings,
   Sheet,
@@ -26,6 +27,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { api, useApi, type Me } from '@/lib/api'
 import { ROLE_LABEL } from '@/lib/format'
 import { ENTITY_NAV, FIRM_NAV, type NavGroup } from '@/lib/nav'
+import { Logo } from './Logo'
 import { Loading } from './ui'
 
 const ICONS: Record<string, typeof Menu> = { BarChart3, BookOpen, Boxes, Briefcase, Building2, Landmark, LayoutDashboard, Percent, Receipt, Settings, Sheet, ShoppingCart, Users }
@@ -35,6 +37,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname() ?? ''
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [palette, setPalette] = useState(false)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPalette((o) => !o)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
   useEffect(() => setMobileOpen(false), [path])
 
   const entityId = path.match(/^\/e\/([0-9a-f-]{36})/)?.[1]
@@ -57,24 +70,21 @@ export default function AppShell({ children }: { children: ReactNode }) {
         Lewati ke konten
       </a>
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-primary-strong text-slate-200 transition-transform duration-200 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-primary-strong text-taupe transition-transform duration-200 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
         aria-label="Navigasi utama"
       >
-        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary font-bold text-white" aria-hidden>
-            A
+        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-4">
+          <div className="min-w-0">
+            <Logo reversed size={24} />
+            <div className="mt-0.5 truncate pl-[2.1rem] text-[11px] text-taupe-deep">{me.firm.name}</div>
           </div>
-          <div className="min-w-0 leading-tight">
-            <div className="truncate font-semibold text-white">Accounting OS</div>
-            <div className="truncate text-[11px] text-slate-400">{me.firm.name}</div>
-          </div>
-          <button className="ml-auto p-1 lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Tutup menu">
+          <button className="ml-auto p-1 text-taupe lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Tutup menu">
             <X size={18} />
           </button>
         </div>
 
         {entityId && (
-          <Link href="/firm" className="mx-3 mt-3 flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-xs text-slate-300 hover:bg-white/5">
+          <Link href="/firm" className="mx-3 mt-3 flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-taupe hover:bg-white/5">
             <Briefcase size={14} aria-hidden /> Kembali ke Beranda Firma
           </Link>
         )}
@@ -84,23 +94,34 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <NavSection key={g.key} group={g} base={base} path={path} />
           ))}
           {entityId && (
-            <Link href="/firm/approvals" className="mt-2 flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white">
+            <Link href="/firm/approvals" className="mt-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-taupe hover:bg-white/10 hover:text-white">
               <Inbox size={16} aria-hidden /> Kotak Persetujuan
             </Link>
           )}
         </nav>
-        {demo && <div className="mx-3 mb-3 rounded-md bg-accent/20 px-3 py-2 text-[11px] text-amber-200">Sandbox DEMO — bukan data klien sungguhan.</div>}
+        {demo && <div className="mx-3 mb-3 rounded-lg bg-accent/20 px-3 py-2 text-[11px] text-white">Sandbox DEMO — bukan data klien sungguhan.</div>}
       </aside>
       {mobileOpen && <div className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={() => setMobileOpen(false)} aria-hidden />}
 
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface px-4">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-cream/95 px-4 backdrop-blur">
           <button className="p-1 lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Buka menu">
             <Menu size={20} />
           </button>
           <EntitySwitcher me={me} current={entityId} />
           {entity && <span className="hidden truncate text-xs text-muted-fg md:inline">Klien: {entity.clientName}</span>}
-          <div className="ml-auto flex items-center gap-3">
+          <button
+            className="btn-secondary ml-auto hidden min-h-[36px] w-56 justify-start gap-2 font-medium text-muted-fg md:inline-flex"
+            onClick={() => setPalette(true)}
+            aria-label="Cari menu (Ctrl+K)"
+          >
+            <Search size={14} aria-hidden /> <span className="flex-1 text-left">Cari menu…</span>
+            <kbd className="rounded border border-line bg-cream px-1.5 text-[10px]">Ctrl K</kbd>
+          </button>
+          <button className="btn-ghost md:hidden" onClick={() => setPalette(true)} aria-label="Cari menu">
+            <Search size={18} aria-hidden />
+          </button>
+          <div className="flex items-center gap-3">
             <div className="hidden text-right leading-tight sm:block">
               <div className="text-sm font-medium">{me.user.fullName}</div>
               <div className="text-[11px] text-muted-fg">{ROLE_LABEL[me.user.role]}</div>
@@ -110,9 +131,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </button>
           </div>
         </header>
-        <main id="main" className="mx-auto max-w-[1400px] p-4 md:p-6">
+        <main id="main" className="mx-auto max-w-[1400px] p-4 md:p-8">
           {children}
         </main>
+        {palette && <CommandPalette groups={groups} base={base} onClose={() => setPalette(false)} />}
       </div>
     </div>
   )
@@ -134,7 +156,7 @@ function NavSection({ group, base, path }: { group: NavGroup; base: string; path
     return (
       <Link
         href={hrefOf(it.href)}
-        className={`mb-0.5 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${activeHref(it.href) ? 'bg-primary text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}
+        className={`mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeHref(it.href) ? 'bg-white/10 text-white shadow-[inset_3px_0_0_rgb(var(--accent))]' : 'text-taupe hover:bg-white/10 hover:text-white'}`}
         aria-current={activeHref(it.href) ? 'page' : undefined}
       >
         <Icon size={16} aria-hidden />
@@ -147,7 +169,7 @@ function NavSection({ group, base, path }: { group: NavGroup; base: string; path
   return (
     <div className="mb-0.5">
       <button
-        className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${containsActive ? 'text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}
+        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors ${containsActive ? 'text-white' : 'text-taupe hover:bg-white/10 hover:text-white'}`}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
       >
@@ -162,7 +184,7 @@ function NavSection({ group, base, path }: { group: NavGroup; base: string; path
             <Link
               key={it.label}
               href={hrefOf(it.href)}
-              className={`my-0.5 flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] transition-colors ${activeHref(it.href) && it.status === 'live' ? 'bg-primary text-white' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}
+              className={`my-0.5 flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors ${activeHref(it.href) && it.status === 'live' ? 'bg-white/10 text-white shadow-[inset_3px_0_0_rgb(var(--accent))]' : 'text-taupe-deep hover:bg-white/10 hover:text-white'}`}
             >
               <span className="flex-1">{it.label}</span>
               {it.status === 'planned' && !allPlanned && <SoonTag />}
@@ -175,7 +197,7 @@ function NavSection({ group, base, path }: { group: NavGroup; base: string; path
 }
 
 function SoonTag() {
-  return <span className="rounded bg-white/10 px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-slate-400">Segera</span>
+  return <span className="rounded bg-white/10 px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-taupe">Segera</span>
 }
 
 function EntitySwitcher({ me, current }: { me: Me; current?: string }) {
@@ -188,7 +210,7 @@ function EntitySwitcher({ me, current }: { me: Me; current?: string }) {
       </label>
       <select
         id="entity-switcher"
-        className="input max-w-[16rem] font-medium sm:max-w-xs"
+        className="input max-w-[16rem] font-semibold sm:max-w-xs"
         value={current ?? ''}
         onChange={(e) => router.push(e.target.value ? `/e/${e.target.value}` : '/firm')}
       >
@@ -203,6 +225,55 @@ function EntitySwitcher({ me, current }: { me: Me; current?: string }) {
           </optgroup>
         ))}
       </select>
+    </div>
+  )
+}
+
+/** Ctrl+K menu search: jump to any live page without opening the sidebar groups. */
+function CommandPalette({ groups, base, onClose }: { groups: NavGroup[]; base: string; onClose: () => void }) {
+  const router = useRouter()
+  const [q, setQ] = useState('')
+  const [idx, setIdx] = useState(0)
+  const items = groups
+    .flatMap((g) => g.items.map((i) => ({ ...i, group: g.label })))
+    .filter((i) => `${i.group} ${i.label}`.toLowerCase().includes(q.trim().toLowerCase()))
+  const go = (i: (typeof items)[number] | undefined) => {
+    if (!i) return
+    router.push(`${base}${i.href}`)
+    onClose()
+  }
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-primary-strong/50 p-4 pt-[12vh]" onClick={onClose} role="presentation">
+      <div
+        className="card w-full max-w-lg overflow-hidden shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Cari menu"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') onClose()
+          if (e.key === 'ArrowDown') (e.preventDefault(), setIdx((i) => Math.min(i + 1, items.length - 1)))
+          if (e.key === 'ArrowUp') (e.preventDefault(), setIdx((i) => Math.max(i - 1, 0)))
+          if (e.key === 'Enter') go(items[idx])
+        }}
+      >
+        <div className="flex items-center gap-2 border-b border-line px-3">
+          <Search size={16} className="text-muted-fg" aria-hidden />
+          <input autoFocus className="min-h-[48px] flex-1 bg-transparent text-sm outline-none" placeholder="Cari menu, mis. Jurnal Umum, Neraca…" value={q} onChange={(e) => (setQ(e.target.value), setIdx(0))} aria-label="Cari menu" />
+        </div>
+        <ul className="max-h-80 overflow-y-auto p-1" role="listbox">
+          {items.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-fg">Tidak ada menu yang cocok.</li>}
+          {items.map((i, n) => (
+            <li key={`${i.group}-${i.label}`} role="option" aria-selected={n === idx}>
+              <button className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm ${n === idx ? 'bg-primary-soft' : ''}`} onMouseEnter={() => setIdx(n)} onClick={() => go(i)}>
+                <span className="font-semibold">{i.label}</span>
+                <span className="text-xs text-muted-fg">{i.group}</span>
+                {i.status === 'planned' && <span className="ml-auto rounded bg-muted/60 px-1.5 text-[10px] font-semibold uppercase text-muted-fg">Segera</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 import { api, ApiError } from '@/lib/api'
+import { Logo } from './Logo'
 import { ErrorSummary, Field } from './ui'
 
 export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
@@ -63,25 +64,25 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
 
   return (
     <div className="flex min-h-screen">
-      <div className="hidden w-[44%] flex-col justify-between bg-primary-strong p-10 text-slate-200 lg:flex">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary font-bold text-white">A</div>
-          <span className="text-lg font-semibold text-white">Accounting OS</span>
-        </div>
-        <div>
-          <h2 className="text-3xl font-semibold leading-tight text-white">Satu ruang kerja untuk seluruh klien kantor akuntan Anda.</h2>
-          <ul className="mt-6 space-y-2 text-sm text-slate-300">
+      <div className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-primary-strong p-10 text-taupe lg:flex">
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-accent/20 blur-3xl" aria-hidden />
+        <Logo reversed size={30} />
+        <div className="relative">
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent">One workspace. Every company.</p>
+          <h2 className="mt-3 text-3xl font-bold leading-tight text-white">Kelola seluruh klien kantor akuntan Anda dalam satu ruang kerja.</h2>
+          <ul className="mt-6 space-y-2 text-sm text-taupe">
             <li>• Multi-klien, multi-perusahaan, multi-cabang dengan isolasi data per firma</li>
             <li>• Jurnal double-entry yang seimbang, tidak dapat diubah setelah diposting</li>
             <li>• Alur draf → diajukan → disetujui → diposting dengan pemisahan tugas</li>
             <li>• Kunci periode, log audit, laporan yang selalu dapat ditelusuri</li>
           </ul>
         </div>
-        <div className="text-xs text-slate-500">Dibangun untuk kantor akuntan di Indonesia</div>
+        <div className="relative text-xs text-taupe-deep">Dibangun untuk kantor akuntan di Indonesia</div>
       </div>
       <div className="flex flex-1 items-center justify-center p-6">
         <form onSubmit={submit} noValidate className="w-full max-w-sm">
-          <h1 className="text-2xl font-semibold">{mode === 'login' ? 'Masuk' : 'Daftarkan firma Anda'}</h1>
+          <div className="mb-8 lg:hidden"><Logo /></div>
+          <h1 className="text-2xl font-bold">{mode === 'login' ? 'Masuk' : 'Daftarkan firma Anda'}</h1>
           <p className="mb-6 mt-1 text-sm text-muted-fg">{mode === 'login' ? 'Masuk ke ruang kerja firma Anda.' : 'Anda akan menjadi Partner pertama di firma ini.'}</p>
           <ErrorSummary messages={summary} />
           <div className="space-y-4">

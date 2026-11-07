@@ -1,41 +1,43 @@
-# Accounting OS — Design System (MASTER)
+# My Account — Design System (MASTER)
 
-Source of truth for UI decisions. Page-specific overrides live in `pages/<page>.md`.
-Derived with the project skill `.claude/skills/ui-ux-pro-max` (searches run 2026-10-23):
+Source of truth for UI decisions. Brand: **My Account — Sand Elegance v1.0** ("Quiet Luxury meets Modern Accounting SaaS", tagline *One workspace. Every company.*).
+Reference art: `assets/logo-reference.png`, `assets/brand-board-reference.png`. Page-specific overrides live in `pages/<page>.md`.
 
-| Decision | Choice | Source |
+## Tricolor 60 / 30 / 10
+
+| Share | Colour | Token | Use |
+|---|---|---|---|
+| 60% | Warm Beige `#F7EFE6` | `--bg` (+ Cream `#FAF7F2` for header/table head, white cards) | canvas, spacious surfaces |
+| 30% | Soft Taupe `#D6CCC1` | `--muted`, `--border` (softened), `--taupe-deep #B9A99B` | borders, section fills, sidebar secondary text |
+| 10% | Terracotta `#C97B63` | `--accent`, `--accent-deep #9C4A34` | selected-state bar, KPI top bars, icon hover, focus/input accent |
+| utility | Dark Espresso `#4A2C22` | `--primary`, `--primary-strong` | text, sidebar, primary buttons |
+
+The ratio is a composition rule, not a pixel quota: dense data pages let Cream/white dominate (guideline §08).
+
+## Contrast (computed, WCAG)
+
+| Pair | Ratio | Decision |
 |---|---|---|
-| Style | Minimalism & Swiss Style — clean, grid-based, high contrast, functional | `--design-system` result (style) |
-| Density | Dense / dashboard (8–32px spacing) | `--density 8` |
-| Palette | "Banking/Traditional Finance": trust navy + gold accent, **light** surfaces | `--domain color` result #2 |
-| Typography | Fira Sans (UI) + Fira Code (amounts, codes) — "Dashboard Data" pairing | `--domain typography` result #1 |
-| Motion | Subtle only (150–250ms colour/opacity), honour `prefers-reduced-motion` | dials `--motion 2` |
+| Espresso on Beige / white | 11.0 / 12.5 | all body text, primary button label |
+| White on Terracotta | 3.2 | **not used for small text**; terracotta is decoration/selected state only |
+| Espresso on Terracotta | 3.9 | not used for small text |
+| Terracotta-deep `#9C4A34` on white / beige | 6.1 / 5.4 | links, small accent text |
+| Muted text `#6F5A50` on beige / white | 5.7 / 6.5 | secondary text (never on Taupe fills: 4.1) |
+| Warning `#B8860B` on white | 3.3 | text uses deepened `#8A6508`; original only as fill |
+| Info `#4F7DBC` on white | 4.2 | text uses deepened `#3F6AA5` |
 
-Deliberate deviation: the generated system suggested a dark default. Accountants work long sessions
-in dense tables and the reference products (Jurnal, Accurate) are light-first, so the app is light-first.
-The landing-page "Enterprise Gateway" pattern from the same search did not fit an application UI and was not used.
+## Typography
+Plus Jakarta Sans only. Display 40–48 bold · H1 32–36 bold (app pages use 28) · H2 24–28 semibold · H3 20–24 semibold · body 14–16 · tables/financial data 13–14 medium · caption 12.
+Financial figures: `font-variant-numeric: tabular-nums`, right-aligned (`.num`), negatives in parentheses and red **plus** the sign, never colour alone. Monospace is kept only for codes/IDs.
 
-## Tokens (CSS variables in `apps/web/app/globals.css`)
+## Components
+Radius 8–12 px (inputs/buttons 8, cards 12), 1px taupe borders, very light shadow, sidebar Espresso with terracotta inset bar for the active item, outline Lucide icons, status badges always carry a text label.
 
-| Token | Value | Use |
-|---|---|---|
-| `--primary` | `#1E3A8A` | primary buttons, links, active nav |
-| `--primary-strong` | `#0F172A` | sidebar, headings |
-| `--accent` | `#A16207` | highlights, "demo/sandbox" marker |
-| `--bg` | `#F8FAFC` | page background |
-| `--card` | `#FFFFFF` | surfaces |
-| `--muted` | `#E8ECF1` | table headers, chips |
-| `--muted-fg` | `#475569` | secondary text (≥4.5:1 on white) |
-| `--border` | `#E2E8F0` | dividers |
-| `--danger` | `#DC2626` | destructive, unbalanced |
-| `--success` | `#047857` | posted, balanced |
+## UX rules added in this rebuild
+Ctrl/⌘+K menu search · dashboard quick actions · company switcher always visible in the header · unfinished modules stay marked "Segera" (never mock data) · 38px minimum control height.
 
-## Rules (from the skill's priority table)
+## Accessibility
+4.5:1 text contrast, visible focus ring (`--accent-deep`), labelled icon buttons, `aria-describedby` for errors, error summary `role="alert"`, `prefers-reduced-motion` honoured.
 
-1. Accessibility: 4.5:1 text contrast, visible focus rings, labelled icon buttons, `aria-describedby` for field errors, error summary with `role="alert"`.
-2. Interaction: loading feedback on every async action, disabled state while pending, no hover-only affordances.
-3. Layout: desktop-first dense tables in `overflow-x-auto` wrappers; usable at 375px; no horizontal page scroll.
-4. Icons: Lucide SVG only, never emoji.
-5. Numbers: right-aligned, `tabular-nums`, Fira Code, negatives in parentheses; amounts are formatted from decimal strings (never via JS floats).
-6. Status colours always paired with a text label (never colour alone).
-7. Unfinished modules are shown as **Segera hadir** with their sprint, never as working screens.
+## Still to do (guideline §08)
+Master vector logo (the in-app monogram is a v1 vector approximation of the supplied art), reversed/mono SVG files, favicon set, exported design tokens for developers.
